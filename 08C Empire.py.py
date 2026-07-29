@@ -1,0 +1,96 @@
+# Decorator: King Permission + Activity Log
+def king_permission(func):
+    def wrapper(*args, **kwargs):
+        password = input("Enter King Password: ")
+        if password == "king123":
+            print("Permission Granted!")
+            print(f"Activity Log: {func.__name__} executed.")
+            return func(*args, **kwargs)
+        else:
+            print("Access Denied!")
+    return wrapper
+class Empire:
+    def __init__(self, name):
+        self.name = name
+        self.citizens = []
+        self.soldiers = []
+        self.gold = 1000
+        self.food = 500
+# Manage Citizens
+    def add_citizen(self, name):
+        self.citizens.append(name)
+        print(name, "joined the empire!")
+# Recruit Soldiers
+    def recruit_soldier(self, name, attack, health):
+        soldier = {
+            "name": name,
+            "attack": attack,
+            "health": health,
+            "active": True
+        }
+        self.soldiers.append(soldier)
+        print(name, "joined the army!")
+# Citizen Iterator
+    def citizen_iterator(self):
+        return iter(self.citizens)
+# Soldier Iterator
+    def soldier_iterator(self):
+        return iter(self.soldiers)
+# Collect Taxes: Add tax method inside Empire class
+    @king_permission
+    def collect_tax(self, amount):
+        self.gold += amount
+        print(amount, "gold collected!")
+# Food Storage
+    def add_food(self, amount):
+        self.food += amount
+        print(amount, "food added!")
+# Gold Treasury
+    def treasury(self):
+        print("\n===== Gold Treasury =====")
+        print("Gold:", self.gold)
+# Army Report
+    def army_report(self):
+        print("\n===== Army Report =====")
+        print("Total Soldiers:", len(self.soldiers))
+        for soldier in self.soldiers:
+            print(
+                "Name:", soldier["name"],
+                "| Attack:", soldier["attack"],
+                "| Health:", soldier["health"],
+                "| Active:", soldier["active"])
+# Generator: Strong Soldiers
+# IMPORTANT: No indentation here
+def strong_soldiers(soldiers):
+        
+        for soldier in soldiers:
+            
+            if soldier["attack"] >= 80 and soldier["active"]:
+                
+                yield soldier
+# Context Manager
+class SaveEmpire:
+    def __init__(self, empire):
+        self.empire = empire
+    def __enter__(self):
+        print("Opening Empire Save File...")
+        return self
+    def __exit__(self, exc_type, exc_value, traceback):
+        with open("empire_save.txt", "w") as file:
+            file.write("Empire: " + self.empire.name + "\n")
+            file.write("Gold: " + str(self.empire.gold) + "\n")
+            file.write("Food: " + str(self.empire.food) + "\n")
+            file.write("Citizens: " + ", ".join(self.empire.citizens) + "\n")
+            file.write("Soldiers:\n")
+            for soldier in self.empire.soldiers:
+                file.write(str(soldier) + "\n")
+        print("Empire Saved Successfully!")
+# Load Empire Data
+def load_empire():
+    try:
+        with open("empire_save.txt", "r") as file:
+            data = file.read()
+            print("\n===== Loaded Empire Data =====")
+            print(data)
+    except FileNotFoundError:
+        print("No saved Empire found!")
